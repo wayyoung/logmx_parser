@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="logmx">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../jar/logmx.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
