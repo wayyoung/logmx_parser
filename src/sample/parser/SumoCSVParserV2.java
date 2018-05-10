@@ -8,7 +8,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class SumoCSVParser extends LogFileParser {
+public class SumoCSVParserV2 extends LogFileParser {
 
     public static final String EXTRA_FW_VERSION_FIELD_KEY="fw_version";
 
@@ -21,14 +21,14 @@ public class SumoCSVParser extends LogFileParser {
     private Pattern pat = Pattern.compile("(\\d{2,4}-\\d{2}-?\\d{0,2}(?:\\s|T)\\d{2}:\\d{2}:\\d{2}(?:.|:)\\d{3}Z?)\\s+([^\\s]+)\\s+([^\\s]+)\\s+([^\\s]+)\\s+([^\\s]+)\\s*:.*");
     private static final List<String> EXTRA_FIELDS_KEYS = Arrays
             .asList(EXTRA_FW_VERSION_FIELD_KEY);
-    int ver=1;
+    protected int ver=2;
     @Override
     protected void parseLine(String line) throws Exception {
 
 
         if (line == null) return;
         if(line.startsWith("\"_messagetimems")){
-            if(!line.contains("reformat_date")) ver=2;//old
+//            if(!line.contains("reformat_date")) ver=2;//old
             return;
         }
 
@@ -41,7 +41,7 @@ public class SumoCSVParser extends LogFileParser {
 
         }
         String msg=pre.substring(pre.indexOf(',')+1);
-        if(ver==1) {
+        if(ver==2) {
             msg = msg.substring(msg.indexOf(',') + 1);
             msg = msg.substring(msg.indexOf(',') + 1);
         }
@@ -92,7 +92,7 @@ public class SumoCSVParser extends LogFileParser {
 
     @Override
     public String getParserName() {
-        return "SumoCSVParser";
+        return "SumoCSVParserV2";
     }
 
     @Override
