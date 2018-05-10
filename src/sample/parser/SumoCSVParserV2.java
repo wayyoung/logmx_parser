@@ -3,6 +3,7 @@ package sample.parser;
 import com.lightysoft.logmx.business.ParsedEntry;
 import com.lightysoft.logmx.mgr.LogFileParser;
 
+import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -52,7 +53,7 @@ public class SumoCSVParserV2 extends LogFileParser {
 
         entry=createNewEntry();
         entry.setUserDefinedFields(new HashMap<String, Object>(1)); // Create an empty Map with only one element allocated
-        entry.setLevel("NORMAL");
+
         entry.setMessage(msg);
         entry.getUserDefinedFields().put(EXTRA_FW_VERSION_FIELD_KEY,sufs[2]);
 
@@ -66,10 +67,16 @@ public class SumoCSVParserV2 extends LogFileParser {
                 }
 
             }else{
-                entry.setDate(df.format(odf.parse(dt.trim())));
+                Date _d=odf.parse(dt.trim());
+                Calendar now=Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+                Calendar c=Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+                c.setTime(_d);
+                c.set(Calendar.YEAR,now.get(Calendar.YEAR));
+                entry.setDate(df.format(c.getTime()));
             }
             entry.setEmitter(matcher.group(5));
         }
+        processMessage(entry,msg);
         addEntry(entry);
 
     }
@@ -81,7 +88,7 @@ public class SumoCSVParserV2 extends LogFileParser {
 
     @Override
     public Date getRelativeEntryDate(ParsedEntry parsedEntry) throws Exception {
-        return Calendar.getInstance().getTime();
+        return df.parse(parsedEntry.getDate());
     }
 
     @Override
@@ -98,5 +105,18 @@ public class SumoCSVParserV2 extends LogFileParser {
     @Override
     public String getSupportedFileType() {
         return "LogMX sample log files";
+    }
+
+    protected void processMessage(ParsedEntry Entry, String message){
+        if(message.contains("proxyDisconnnected")) {
+
+            entry.setLevel("PROXY_DISC");
+            return;
+        }
+        if(message.contains("proxyConnected")){
+            entry.setLevel("PROXY_CONN");
+            return;
+        }
+        entry.setLevel("NORMAL");
     }
 }
